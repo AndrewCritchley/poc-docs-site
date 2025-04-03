@@ -25,7 +25,7 @@ jobs:
       - name: Install Dependencies
         run: |
           pip install mkdocs
-          pip install mkdocs-material  # Install MkDocs Material
+          pip install mkdocs-material 
 
       - name: Build MkDocs Site
         run: mkdocs build  # Build the MkDocs site
@@ -36,17 +36,8 @@ jobs:
           name: mkdocs-site
           path: site  # Upload the built site for the deploy job
 
-  deploy:
-    needs: build  # Ensure deploy only starts after the build job completes
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download Build Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: mkdocs-site  # Download the built site artifact
-
       - name: Deploy MkDocs to GitHub Pages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Use GitHub token for authentication
         run: |
-          mkdocs gh-deploy --force  # Deploy to GitHub Pages
+          mkdocs gh-deploy --force 
