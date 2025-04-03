@@ -11,7 +11,7 @@ permissions:
   id-token: write
 
 jobs:
-  deploy:
+  build:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -30,9 +30,11 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: site
           path: site
 
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
