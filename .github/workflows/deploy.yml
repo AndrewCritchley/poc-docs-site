@@ -31,14 +31,11 @@ jobs:
       - name: Build MkDocs Site
         run: mkdocs build  # Build the MkDocs site
 
-      - name: Upload Build Artifact
-        uses: actions/upload-artifact@v4
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: mkdocs-site
-          path: site  # Upload the built site for the deploy job
-
-      - name: Deploy MkDocs to GitHub Pages
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Use GitHub token for authentication
-        run: |
-          mkdocs gh-deploy --force 
+          path: 'site'
+          
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
