@@ -1,0 +1,38 @@
+name: Deploy MkDocs Material
+
+on:
+  push:
+    branches:
+      - main  # Deploy on push to the main branch
+
+permissions:
+  contents: write  # Permissions needed to push to gh-pages
+  pages: write     # Permissions for GitHub Pages
+  id-token: write  # Necessary for GitHub authentication
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4  # Checkout the repository code
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'  # Set Python version for MkDocs
+
+      - name: Install Dependencies
+        run: |
+          pip install mkdocs
+          pip install mkdocs-material  # Install MkDocs Material
+          pip install mkdocs-plugins  # Install additional plugins (if any)
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Deploy MkDocs to GitHub Pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Use GitHub token to authenticate
+        run: |
+          mkdocs gh-deploy --force  # Build and deploy the site to GitHub Pages
