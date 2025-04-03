@@ -33,6 +33,7 @@ jobs:
           path: site
 
   deploy:
+    needs: build  # Waits for the build job to finish
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to GitHub Pages
