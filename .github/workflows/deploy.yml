@@ -1,16 +1,18 @@
-name: Deploy MkDocs
+name: Deploy MkDocs Material
 
 on:
   push:
     branches:
-      - main
+      - main  # Trigger on push to the main branch
+  workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write  # Permissions to push to gh-pages
+  pages: write     # Permissions for GitHub Pages
+  id-token: write  # Permissions for authentication
 
 jobs:
+  build:
   build:
     environment:
       name: github-pages
@@ -18,11 +20,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4  # Checkout the code from the repo
 
-      - name: Build MkDocs Site in Docker
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'  # Set Python version for MkDocs
+
+      - name: Install Dependencies
         run: |
-          docker run --rm -v ${{ github.workspace }}:/docs squidfunk/mkdocs-material build
+          pip install mkdocs
+          pip install mkdocs-material 
+
+      - name: Build MkDocs Site
+        run: mkdocs build  # Build the MkDocs site
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -30,9 +41,6 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
+          path: 'site'
+          
           path: site
-
-  deploy:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
