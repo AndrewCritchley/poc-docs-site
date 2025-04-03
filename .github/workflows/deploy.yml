@@ -14,7 +14,7 @@ jobs:
 
       - name: Build MkDocs Site in Docker
         run: |
-          docker run --rm -v ${{ github.workspace }}:/docs quidfunk/mkdocs-material build
+          docker run --rm -v ${{ github.workspace }}:/docs squidfunk/mkdocs-material build
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
