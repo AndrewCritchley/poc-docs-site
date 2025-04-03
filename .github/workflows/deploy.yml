@@ -1,42 +1,53 @@
-name: Deploy MkDocs
+name: Deploy MkDocs Material
 
 on:
   push:
     branches:
-      - main
+      - main  # Trigger on push to the main branch
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write  # Permissions to push to gh-pages
+  pages: write     # Permissions for GitHub Pages
+  id-token: write  # Permissions for authentication
 
 jobs:
   build:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4  # Checkout the code from the repo
 
-      - name: Build MkDocs Site in Docker
-        run: |
-          docker run --rm -v ${{ github.workspace }}:/docs squidfunk/mkdocs-material build
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          name: github-pages
-          path: site
+          python-version: '3.x'  # Set Python version for MkDocs
+
+      - name: Install Dependencies
+        run: |
+          pip install mkdocs
+          pip install mkdocs-material  # Install MkDocs Material
+          pip install mkdocs-plugins  # Install any extra plugins
+
+      - name: Build MkDocs Site
+        run: mkdocs build  # Build the MkDocs site
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: mkdocs-site
+          path: site  # Upload the built site for the deploy job
 
   deploy:
-    needs: build  # Waits for the build job to finish
+    needs: build  # Ensure deploy only starts after the build job completes
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: mkdocs-site  # Download the built site artifact
+
+      - name: Deploy MkDocs to GitHub Pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Use GitHub token for authentication
+        run: |
+          mkdocs gh-deploy --force  # Deploy to GitHub Pages
