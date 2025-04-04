@@ -21,18 +21,11 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4  # Checkout the code from the repo
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'  # Set Python version for MkDocs
+      - name: Build Docker image
+        run: docker build -t mkdocs-builder .
 
-      - name: Install Dependencies
-        run: |
-          pip install mkdocs
-          pip install mkdocs-material 
-
-      - name: Build MkDocs Site
-        run: mkdocs build  # Build the MkDocs site
+      - name: Run MkDocs build inside container
+        run: docker run --rm -v ${{ github.workspace }}:/docs mkdocs-builder build --clean
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
