@@ -1,6 +1,7 @@
 FROM python:3.11-slim
 
-RUN pip install mkdocs-material
+RUN pip install \ 
+    mkdocs-material
 
 WORKDIR /docs
 COPY . .
