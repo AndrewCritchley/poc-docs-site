@@ -1,39 +1,45 @@
-name: Deploy MkDocs Material
+name: Deploy MkDocs
 
 on:
   push:
     branches:
-      - main  # Trigger on push to the main branch
+      - main
   workflow_dispatch:
 
 permissions:
-  contents: write  # Permissions to push to gh-pages
-  pages: write     # Permissions for GitHub Pages
-  id-token: write  # Permissions for authentication
+  contents: write
+  pages: write
+  id-token: write
 
 jobs:
   build:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+    name: Build MkDocs
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4  # Checkout the code from the repo
+        uses: actions/checkout@v4
 
       - name: Build Docker image
-        run: docker build -t mkdocs-builder .
+        run: docker build -t poc-andrew-mkdocs-site .
 
       - name: Run MkDocs build inside container
-        run: docker run --rm -v ${{ github.workspace }}:/docs mkdocs-builder build --clean
+        run: docker run --rm -v ${{ github.workspace }}:/docs poc-andrew-mkdocs-site build --clean
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-        
       - name: Upload Artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: 'site'
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
 
       - name: Deploy to GitHub Pages
         id: deployment
